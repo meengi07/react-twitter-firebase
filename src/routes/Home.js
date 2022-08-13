@@ -1,5 +1,7 @@
 import React, {useEffect, useState} from "react";
-import {dbService} from "fbase";
+import {ref, uploadString } from "firebase/storage"
+import { v4 as uuidv4 } from 'uuid';
+import {dbService, storageService} from "fbase";
 import { collection, addDoc, getDocs, query, onSnapshot, doc, orderBy } from "firebase/firestore";
 import { async } from "@firebase/util";
 import Nweet from "components/Nweet";
@@ -8,7 +10,7 @@ import Nweet from "components/Nweet";
     
     const [tweet, setTweet] = useState("");
     const [ntweets, setNtweets] = useState([]);
-    
+    const [attachment, setAttachment] = useState();
 
     useEffect(() => {
         const q = query(collection(dbService, "ntweet"));
@@ -24,12 +26,15 @@ import Nweet from "components/Nweet";
     }, []);
     const onSubmit = async(event) => {
         event.preventDefault();
-        await addDoc(collection(dbService,"ntweet"),{
-            text: tweet, 
-            createdAt: Date.now(),
-            creatorId: userObj.uid,
-        });    
-        setTweet("");
+        const fileRef = ref(storageService, `${userObj.uid}/${uuidv4()}`);
+        const response = await uploadString(fileRef, attachment, "data_url");
+        console.log(response)
+        // await addDoc(collection(dbService,"ntweet"),{
+        //     text: tweet, 
+        //     createdAt: Date.now(),
+        //     creatorId: userObj.uid,
+        // });    
+        // setTweet("");
  }
     const onChange = (e) => {
         const {
@@ -37,12 +42,33 @@ import Nweet from "components/Nweet";
         } = e;
         setTweet(value);
     }
-    
+    const onFileChange = (event) => {
+        const {
+            target: {files},
+        } = event;
+        const theFile = files[0];
+        const reader = new FileReader();
+        reader.onloadend = (finishedEvent) => {
+            const {
+                currentTarget: {result},
+            } = finishedEvent;    
+            setAttachment(result);
+        }
+        reader.readAsDataURL(theFile);
+    }
+    const ClearAttachment = () => setAttachment(null);
  return (
         <div>
             <form onSubmit={onSubmit}>
                 <input value={tweet} onChange={onChange} type="text" placeholder="What's on your mind?" maxLength={120} />
+                <input type="file" accept="image/*" onChange={onFileChange}/>
                 <input type="submit" value="Tweet" />
+                {attachment && (
+                <div>
+                    <img src={attachment} width="100px" height="100px" />
+                    <button onClick={ClearAttachment}>Clear</button>
+                </div>
+                    )}
             </form>
             <div>
                 {ntweets.map((nweet) => (
