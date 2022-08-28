@@ -5,12 +5,12 @@ import { updateProfile } from "firebase/auth";
 
 // eslint-disable-next-line import/no-anonymous-default-export
 const Profile =  ({refreshUser,user}) => {
-    // const [nweets, setNweets] = useState([]);
     const [newDisplayName, setNewDisplayName] = useState(user.displayName);
     const navigate = useNavigate();
     const onLogOutClick = () => {
         authService.signOut();
         navigate("/");
+    
     };
     const onChange = (event) => {
         const {
@@ -29,16 +29,29 @@ const Profile =  ({refreshUser,user}) => {
     };
 
     return (
-    <>
-        <form onSubmit={onSubmit}>
+    <div className="container">
+        <form onSubmit={onSubmit} className="profileForm">
             <input 
-            onChange={onChange} 
-            type="text" placeholder="Display Name" 
-            value={newDisplayName} />
-            <input type="submit" placeholder="Update Profile "/>
+                onChange={onChange} 
+                type="text" 
+                placeholder="Display Name" 
+                value={newDisplayName} 
+                autoFocus 
+                className="formInput"
+            />
+             <input
+                type="submit"
+                value="Update Profile"
+                className="formBtn"
+                style={{
+                    marginTop: 10,
+                }}
+            />
         </form>
-        <button onClick={onLogOutClick}>Log Out</button>
-    </>
+        <span className="formBtn cancelBtn logOut" onClick={onLogOutClick}>
+            Log Out
+        </span>
+    </div>
 )};
 
 export default Profile;

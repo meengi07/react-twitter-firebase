@@ -9,11 +9,20 @@ import Navigation from "./Navigation";
 const AppRouter = ({refreshUser,isLoggIn, user}) => {
     
     return (
+        <div  style={{
+            maxWidth: 890,
+            width: "100%",
+            margin: "0 auto",
+            marginTop: 80,
+            display: "flex",
+            justifyContent: "center",
+          }}>
         <Router>
             {isLoggIn && <Navigation userObj={user} />}
             <Routes>
                 {isLoggIn ? (
-                    <>
+                     <>
+                    
                         <Route exact path='/' element={<Home userObj={user}/>} />
                         <Route exact path='/Profile' element={<Profile user={user} refreshUser={refreshUser}/>}/>
                         <Route path="/" element={<Navigate replace to="/home" />} />
@@ -26,6 +35,7 @@ const AppRouter = ({refreshUser,isLoggIn, user}) => {
                 )}
             </Routes>
         </Router>
+        </div>
     );
 };
 
